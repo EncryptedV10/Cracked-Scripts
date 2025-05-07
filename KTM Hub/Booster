@@ -1,0 +1,63 @@
+local spoofedUsername = "Micaxan"
+local whitelistedUsername = game.Players.LocalPlayer.Name
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local lp = Players.LocalPlayer
+
+local mt = getrawmetatable(game)
+setreadonly(mt, false)
+
+local oldIndex = mt.__index
+mt.__index = newcclosure(function(t, k)
+    if t == lp and k == "Name" then
+        return spoofedUsername
+    end
+    return oldIndex(t, k)
+end)
+
+setreadonly(mt, true)
+
+wait(1)
+
+local function whitelistSelf()
+    local mt2 = getrawmetatable(game)
+    setreadonly(mt2, false)
+    local oldIndex2 = mt2.__index
+    mt2.__index = newcclosure(function(t, k)
+        if t == lp and k == "Name" then
+            return whitelistedUsername
+        end
+        return oldIndex2(t, k)
+    end)
+    setreadonly(mt2, true)
+end
+
+whitelistSelf()
+
+wait(1)
+
+local mt3 = getrawmetatable(Players.LocalPlayer)
+setreadonly(mt3, false)
+
+local oldKick = mt3.__index
+mt3.__index = newcclosure(function(t, k)
+    if k == "Kick" then
+        return function() end
+    end
+    return oldKick(t, k)
+end)
+
+setreadonly(mt3, true)
+
+local function safeLoadString(url)
+    local success, result = pcall(function()
+        loadstring(game:HttpGet(url))()
+    end)
+
+    if not success then
+        warn("Error loading script: " .. result)
+    end
+end
+
+safeLoadString("https://raw.githubusercontent.com/iblameaabis/Boosters/refs/heads/main/Boosters%20Script%20KTM")
