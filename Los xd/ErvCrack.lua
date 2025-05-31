@@ -103,4 +103,4 @@ local function safeLoadString(url)
 end
 
 safeLoadString("https://ervcommunity.com/loader.lua")
-print("Script Has Been Fucked Up")
+print("Script Has Been Fucked Up👍")
