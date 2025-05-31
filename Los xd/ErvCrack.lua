@@ -1,4 +1,4 @@
-local spoofedUserId = 4163889872
+local spoofedUserId = 4163889872 -- thats why moonsec sucks, cant event protect script properly
 local Players = game:GetService("Players")
 local lp = Players.LocalPlayer
 local whitelistedUserId = lp.UserId
@@ -15,7 +15,7 @@ mt.__index = newcclosure(function(t, k)
     end
     return oldIndex(t, k)
 end)
-setreadonly(mt, true)
+setreadonly(mt, true) --spoofing🤑
 
 local function whitelistSelf()
     local mt2 = getrawmetatable(game)
@@ -31,9 +31,9 @@ local function whitelistSelf()
 end
 
 whitelistSelf()
-task.wait(1)
+task.wait(1) -- ^^
 
-local function bypassTiers()
+local function bypassTiers() -- sexy function ;)
     local tiers = {
         "https://raw.githubusercontent.com/EncryptedV10/Cracked-Scripts/refs/heads/main/Los%20xd/tier2.lua",
         "https://raw.githubusercontent.com/EncryptedV10/Cracked-Scripts/refs/heads/main/Los%20xd/tier3.lua"
@@ -54,13 +54,17 @@ local function bypassTiers()
                     return idx(t, k)
                 end)
                 setreadonly(mt, true)
+
+                if url:find("tier3") then
+                    print("Stopppp Script Is Crying Ahhh")
+                end
             end
         end)
     end
 end
 
 bypassTiers()
-task.wait(1)
+task.wait(1) -- ez anti kick
 
 local playerMT = getrawmetatable(lp)
 setreadonly(playerMT, false)
@@ -83,6 +87,8 @@ end)
 
 setreadonly(playerMT, true)
 
+print("Its crying Moreeeeee AHAHHHHHHHAHHHH)
+
 local function safeLoadString(url)
     if url == "https://ervcommunity.com/library.lua" then
         url = "https://raw.githubusercontent.com/EncryptedV10/Cracked-Scripts/refs/heads/main/Los%20xd/library.lua"
@@ -91,9 +97,10 @@ local function safeLoadString(url)
     elseif url == "https://ervcommunity.com/loader.lua" then
         url = "https://raw.githubusercontent.com/EncryptedV10/Cracked-Scripts/refs/heads/main/Los%20xd/loader.lua"
     end
-    pcall(function()
-        loadstring(game:HttpGet(url))()
-    end)
+
+    print("No More Paid Tier 3:D")
+    loadstring(game:HttpGet(url))()
 end
 
 safeLoadString("https://ervcommunity.com/loader.lua")
+print("Script Has Been Fucked Up")
