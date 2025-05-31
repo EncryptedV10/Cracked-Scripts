@@ -7,60 +7,61 @@ local mt = getrawmetatable(game)
 setreadonly(mt, false)
 local oldIndex = mt.__index
 mt.__index = newcclosure(function(t, k)
-    if k == "IsInGroup" then
-        return function() return true end
-    end
-    if t == lp and k == "UserId" then
-        return spoofedUserId
-    end
-    return oldIndex(t, k)
+if k == "IsInGroup" then
+return function() return true end
+end
+if t == lp and k == "UserId" then
+return spoofedUserId
+end
+return oldIndex(t, k)
 end)
 setreadonly(mt, true) --spoofing🤑
 
 local function whitelistSelf()
-    local mt2 = getrawmetatable(game)
-    setreadonly(mt2, false)
-    local oldIndex2 = mt2.__index
-    mt2.__index = newcclosure(function(t, k)
-        if t == lp and k == "UserId" then
-            return whitelistedUserId
-        end
-        return oldIndex2(t, k)
-    end)
-    setreadonly(mt2, true)
+local mt2 = getrawmetatable(game)
+setreadonly(mt2, false)
+local oldIndex2 = mt2.__index
+mt2.__index = newcclosure(function(t, k)
+if t == lp and k == "UserId" then
+return whitelistedUserId
+end
+return oldIndex2(t, k)
+end)
+setreadonly(mt2, true)
 end
 
 whitelistSelf()
 task.wait(1) -- ^^
 
 local function bypassTiers() -- sexy function ;)
-    local tiers = {
-        "https://raw.githubusercontent.com/EncryptedV10/Cracked-Scripts/refs/heads/main/Los%20xd/tier2.lua",
-        "https://raw.githubusercontent.com/EncryptedV10/Cracked-Scripts/refs/heads/main/Los%20xd/tier3.lua"
-    }
+local tiers = {
+"https://raw.githubusercontent.com/EncryptedV10/Cracked-Scripts/refs/heads/main/Los%20xd/tier2.lua",
+"https://raw.githubusercontent.com/EncryptedV10/Cracked-Scripts/refs/heads/main/Los%20xd/tier3.lua"
+}
 
-    for _, url in ipairs(tiers) do
-        local s = pcall(function()
-            local data = loadstring(game:HttpGet(url))()
-            if data then
-                table.insert(data, spoofedUserId)
-                local mt = getrawmetatable(game)
-                local idx = mt.__index
-                setreadonly(mt, false)
-                mt.__index = newcclosure(function(t, k)
-                    if k == "UserId" then
-                        return spoofedUserId
-                    end
-                    return idx(t, k)
-                end)
-                setreadonly(mt, true)
+for _, url in ipairs(tiers) do  
+    local s = pcall(function()  
+        local data = loadstring(game:HttpGet(url))()  
+        if data then  
+            table.insert(data, spoofedUserId)  
+            local mt = getrawmetatable(game)  
+            local idx = mt.__index  
+            setreadonly(mt, false)  
+            mt.__index = newcclosure(function(t, k)  
+                if k == "UserId" then  
+                    return spoofedUserId  
+                end  
+                return idx(t, k)  
+            end)  
+            setreadonly(mt, true)  
 
-                if url:find("tier3") then
-                    print("Stopppp Script Is Crying Ahhh")
-                end
-            end
-        end)
-    end
+            if url:find("tier3") then  
+                print("Stopppp Script Is Crying Ahhh")  
+            end  
+        end  
+    end)  
+end
+
 end
 
 bypassTiers()
@@ -72,34 +73,38 @@ local oldIndex = playerMT.__index
 local oldNamecall = playerMT.__namecall
 
 playerMT.__index = newcclosure(function(t, k)
-    if k == "Kick" then
-        return function() end
-    end
-    return oldIndex(t, k)
+if k == "Kick" then
+return function() end
+end
+return oldIndex(t, k)
 end)
 
 playerMT.__namecall = newcclosure(function(self, ...)
-    if getnamecallmethod() == "Kick" then
-        return
-    end
-    return oldNamecall(self, ...)
+if getnamecallmethod() == "Kick" then
+return
+end
+return oldNamecall(self, ...)
 end)
 
 setreadonly(playerMT, true)
 
-print("Its crying Moreeeeee AHAHHHHHHHAHHHH)
+print("Its crying Moreeeeee AHAHHHHHHHAHHHH")
 
 local function safeLoadString(url)
-    if url == "https://ervcommunity.com/library.lua" then
-        url = "https://raw.githubusercontent.com/EncryptedV10/Cracked-Scripts/refs/heads/main/Los%20xd/library.lua"
-    elseif url == "https://raw.githubusercontent.com/hxnrych/database/refs/heads/main/misc/blacklist.lua" then
-        url = "https://raw.githubusercontent.com/EncryptedV10/Cracked-Scripts/refs/heads/main/Los%20xd/Blacklist.lua"
-    elseif url == "https://ervcommunity.com/loader.lua" then
-        url = "https://raw.githubusercontent.com/EncryptedV10/Cracked-Scripts/refs/heads/main/Los%20xd/loader.lua"
-    end
+if url == "https://ervcommunity.com/library.lua" then
+url = "https://raw.githubusercontent.com/EncryptedV10/Cracked-Scripts/refs/heads/main/Los%20xd/library.lua"
+elseif url == "https://raw.githubusercontent.com/hxnrych/database/refs/heads/main/misc/blacklist.lua" then
+url = "https://raw.githubusercontent.com/EncryptedV10/Cracked-Scripts/refs/heads/main/Los%20xd/Blacklist.lua"
+elseif url == "https://ervcommunity.com/loader.lua" then
+url = "https://raw.githubusercontent.com/EncryptedV10/Cracked-Scripts/refs/heads/main/Los%20xd/loader.lua"
+end
 
-    print("No More Paid Tier 3:D")
-    loadstring(game:HttpGet(url))()
+print("No More Paid Tier 3:D")  
+local code = game:HttpGet(url)
+if typeof(code) == "string" then
+    loadstring(code)()
+end
+
 end
 
 safeLoadString("https://ervcommunity.com/loader.lua")
