@@ -1,0 +1,156 @@
+local library = loadstring(game:HttpGet("https://pastebin.com/raw/Abg3RkND", true))()
+
+local window = library:AddWindow("Auto Race Script For Farrah By Adopt :)", {
+    main_color = Color3.fromRGB(41, 74, 122),
+    min_size = Vector2.new(450, 400),
+    can_resize = false
+})
+
+local racingTab = window:AddTab("Racing")
+local raceMethod = "Teleport"
+local autoRaceEnabled = false
+local autoFillEnabled = false
+local raceThread
+local fillThread
+
+local methodDropdown = racingTab:AddDropdown("Race Method", function(option)
+    raceMethod = option
+end)
+methodDropdown:Add("Teleport")
+methodDropdown:Add("Smooth")
+
+racingTab:AddSwitch("Auto Race", function(state)
+    autoRaceEnabled = state
+    if autoRaceEnabled then
+        raceThread = task.spawn(function()
+            local raceFired = false
+            local teleported = false
+            while autoRaceEnabled do
+                local raceTimer = game:GetService("ReplicatedStorage"):FindFirstChild("raceTimer")
+                local raceStarted = game:GetService("ReplicatedStorage"):FindFirstChild("raceStarted")
+                if raceMethod == "Teleport" then
+                    local char = game.Players.LocalPlayer.Character
+                    if char and char:FindFirstChild("HumanoidRootPart") then
+                        char:MoveTo(Vector3.new(1686.07, 36.31, -5946.63))
+                        task.wait(0.1)
+                        char:MoveTo(Vector3.new(48.31, 36.31, -8680.45))
+                        task.wait(0.1)
+                        char:MoveTo(Vector3.new(1001.33, 36.31, -10986.21))
+                        task.wait(0.1)
+                    end
+                    if raceTimer and raceTimer:IsA("IntValue") and raceTimer.Value <= 0 then
+                        task.wait(0.5)
+                        game:GetService("ReplicatedStorage"):WaitForChild("rEvents"):WaitForChild("raceEvent"):FireServer("joinRace")
+                    end
+                elseif raceMethod == "Smooth" then
+                    if raceTimer and raceTimer:IsA("IntValue") and raceTimer.Value <= 0 and not raceFired then
+                        task.wait(0.5)
+                        game:GetService("ReplicatedStorage"):WaitForChild("rEvents"):WaitForChild("raceEvent"):FireServer("joinRace")
+                        raceFired = true
+                        teleported = false
+                    end
+                    if raceStarted and raceStarted:IsA("BoolValue") and raceStarted.Value == true and not teleported then
+                        local finishParts = workspace:GetDescendants()
+                        local closestPart = nil
+                        local minDist = math.huge
+                        local char = game.Players.LocalPlayer.Character
+                        if char and char:FindFirstChild("HumanoidRootPart") then
+                            for _, part in ipairs(finishParts) do
+                                if part:IsA("BasePart") and part.Name == "finishPart" then
+                                    local dist = (char.HumanoidRootPart.Position - part.Position).Magnitude
+                                    if dist < minDist then
+                                        minDist = dist
+                                        closestPart = part
+                                    end
+                                end
+                            end
+                            if closestPart then
+                                char:MoveTo(closestPart.Position)
+                                teleported = true
+                            end
+                        end
+                    end
+                    if raceStarted and raceStarted:IsA("BoolValue") and raceStarted.Value == false then
+                        raceFired = false
+                    end
+                end
+                task.wait(0.05)
+            end
+        end)
+    end
+end)
+
+racingTab:AddSwitch("Auto Fill Race", function(state)
+    autoFillEnabled = state
+    if autoFillEnabled then
+        fillThread = task.spawn(function()
+            local raceEvent = game:GetService("ReplicatedStorage").rEvents.raceEvent
+            while autoFillEnabled do
+                task.wait(0.01)
+                raceEvent:FireServer("joinRace")
+            end
+        end)
+    end
+end)
+
+racingTab:AddSwitch("Anti Kick", function(state)
+    if state then
+        wait(0.5)
+        local ba = Instance.new("ScreenGui")
+        ba.Name = "AntiKickUI"
+        local ca = Instance.new("TextLabel")
+        local da = Instance.new("Frame")
+        local _b = Instance.new("TextLabel")
+        local ab = Instance.new("TextLabel")
+        ba.Parent = game.CoreGui
+        ba.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+        ca.Parent = ba
+        ca.Active = true
+        ca.BackgroundColor3 = Color3.new(0.176471, 0.176471, 0.176471)
+        ca.Draggable = true
+        ca.Position = UDim2.new(0.698610067, 0, 0.098096624, 0)
+        ca.Size = UDim2.new(0, 370, 0, 52)
+        ca.Font = Enum.Font.SourceSansSemibold
+        ca.Text = "Anti Afk"
+        ca.TextColor3 = Color3.new(0, 1, 1)
+        ca.TextSize = 22
+        da.Parent = ca
+        da.BackgroundColor3 = Color3.new(0.196078, 0.196078, 0.196078)
+        da.Position = UDim2.new(0, 0, 1.0192306, 0)
+        da.Size = UDim2.new(0, 370, 0, 107)
+        _b.Parent = da
+        _b.BackgroundColor3 = Color3.new(0.176471, 0.176471, 0.176471)
+        _b.Position = UDim2.new(0, 0, 0.800455689, 0)
+        _b.Size = UDim2.new(0, 370, 0, 21)
+        _b.Font = Enum.Font.Arial
+        _b.Text = "Made by luca#5432"
+        _b.TextColor3 = Color3.new(0, 1, 1)
+        _b.TextSize = 20
+        ab.Parent = da
+        ab.BackgroundColor3 = Color3.new(0.176471, 0.176471, 0.176471)
+        ab.Position = UDim2.new(0, 0, 0.158377, 0)
+        ab.Size = UDim2.new(0, 370, 0, 44)
+        ab.Font = Enum.Font.ArialBold
+        ab.Text = "Status: Active"
+        ab.TextColor3 = Color3.new(0, 1, 1)
+        ab.TextSize = 20
+        local bb = game:GetService("VirtualUser")
+        antiKickConnection = game.Players.LocalPlayer.Idled:Connect(function()
+            bb:CaptureController()
+            bb:ClickButton2(Vector2.new())
+            ab.Text = "Roblox tried kicking you, but I won't let them!"
+            wait(2)
+            ab.Text = "Status: Active"
+        end)
+        antiKickGui = ba
+    else
+        if antiKickConnection then
+            antiKickConnection:Disconnect()
+            antiKickConnection = nil
+        end
+        if antiKickGui then
+            antiKickGui:Destroy()
+            antiKickGui = nil
+        end
+    end
+end)
