@@ -153,9 +153,43 @@ end)
 
 local Killer = window:CreateTab("Killing")
 
+local autoGoodKarma = false
+local autoBadKarma = false
+local autoKill = false
+local killTarget = false
+local spying = false
+local autoEquipPunch = false
+local autoPunchNoAnim = false
+local _G_autoPunchActive = false
+local _G_fastHitActive = false
+local playerWhitelist = {}
+local targetPlayerName = nil
+
+local function formatNumber(number)
+    if not number then return "0" end
+    local formatted = tostring(math.floor(number))
+    local k
+    while true do  
+        formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+        if k == 0 then break end
+    end
+    return formatted
+end
+
+local function formatLargeNumber(num)
+    if num >= 1e9 then
+        return string.format("%.2fB", num / 1e9)
+    elseif num >= 1e6 then
+        return string.format("%.2fM", num / 1e6)
+    elseif num >= 1e3 then
+        return string.format("%.2fK", num / 1e3)
+    else
+        return string.format("%.0f", num)
+    end
+end
+
 Killer:AddToggle("Auto Good Karma", function(bool)
     autoGoodKarma = bool
-
     if autoGoodKarma then
         spawn(function()
             while autoGoodKarma do
@@ -169,11 +203,9 @@ Killer:AddToggle("Auto Good Karma", function(bool)
                         if target ~= player then
                             local evilKarma = target:FindFirstChild("evilKarma")
                             local goodKarma = target:FindFirstChild("goodKarma")
-
                             if evilKarma and goodKarma and evilKarma:IsA("IntValue") and goodKarma:IsA("IntValue") and evilKarma.Value > goodKarma.Value then
                                 local targetChar = target.Character
                                 local rootPart = targetChar and targetChar:FindFirstChild("HumanoidRootPart")
-
                                 if rootPart then
                                     firetouchinterest(rightHand, rootPart, 1)
                                     firetouchinterest(leftHand, rootPart, 1)
@@ -192,7 +224,6 @@ end)
 
 Killer:AddToggle("Auto Bad Karma", function(bool)
     autoBadKarma = bool
-
     if autoBadKarma then
         spawn(function()
             while autoBadKarma do
@@ -206,11 +237,9 @@ Killer:AddToggle("Auto Bad Karma", function(bool)
                         if target ~= player then
                             local evilKarma = target:FindFirstChild("evilKarma")
                             local goodKarma = target:FindFirstChild("goodKarma")
-
                             if evilKarma and goodKarma and evilKarma:IsA("IntValue") and goodKarma:IsA("IntValue") and goodKarma.Value > evilKarma.Value then
                                 local targetChar = target.Character
                                 local rootPart = targetChar and targetChar:FindFirstChild("HumanoidRootPart")
-
                                 if rootPart then
                                     firetouchinterest(rightHand, rootPart, 1)
                                     firetouchinterest(leftHand, rootPart, 1)
@@ -228,7 +257,6 @@ Killer:AddToggle("Auto Bad Karma", function(bool)
 end)
 
 Killer:AddLabel("Whitelisting")
-local playerWhitelist = {}
 Killer:AddTextBox("Whitelist", function(text)
     local targetPlayer = game.Players:FindFirstChild(text)
     if targetPlayer then
@@ -244,22 +272,17 @@ Killer:AddTextBox("UnWhitelist", function(text)
 end)
 
 Killer:AddLabel("Auto Killing")
-local autoKill = false
 Killer:AddToggle("Auto Kill", function(bool)
     autoKill = bool
-
     while autoKill do
         local player = game.Players.LocalPlayer
-
         for _, target in ipairs(game.Players:GetPlayers()) do
             if target ~= player and not playerWhitelist[target.Name] then
                 local targetChar = target.Character
                 local rootPart = targetChar and targetChar:FindFirstChild("HumanoidRootPart")
-
                 if rootPart then
                     local rightHand = player.Character and player.Character:FindFirstChild("RightHand")
                     local leftHand = player.Character and player.Character:FindFirstChild("LeftHand")
-
                     if rightHand and leftHand then
                         firetouchinterest(rightHand, rootPart, 1)
                         firetouchinterest(leftHand, rootPart, 1)
@@ -269,13 +292,11 @@ Killer:AddToggle("Auto Kill", function(bool)
                 end
             end
         end
-
         wait(0.01)
     end
 end)
 
 Killer:AddLabel("Targeting")
-local targetPlayerName = nil
 Killer:AddTextBox("Target Name", function(text)
     targetPlayerName = text
 end)
@@ -286,7 +307,7 @@ end)
 
 for _, player in ipairs(game.Players:GetPlayers()) do
     targetDropdown:Add(player.Name)
-end
+end)
 
 game.Players.PlayerAdded:Connect(function(player)
     targetDropdown:Add(player.Name)
@@ -296,22 +317,17 @@ game.Players.PlayerRemoving:Connect(function(player)
     targetDropdown:Remove(player.Name)
 end)
 
-local killTarget = false
 Killer:AddToggle("Kill Target", function(bool)
     killTarget = bool
-
     while killTarget do
         local player = game.Players.LocalPlayer
         local target = game.Players:FindFirstChild(targetPlayerName)
-
         if target and target ~= player then
             local targetChar = target.Character
             local rootPart = targetChar and targetChar:FindFirstChild("HumanoidRootPart")
-
             if rootPart then
                 local rightHand = player.Character and player.Character:FindFirstChild("RightHand")
                 local leftHand = player.Character and player.Character:FindFirstChild("LeftHand")
-
                 if rightHand and leftHand then
                     firetouchinterest(rightHand, rootPart, 1)
                     firetouchinterest(leftHand, rootPart, 1)
@@ -320,87 +336,71 @@ Killer:AddToggle("Kill Target", function(bool)
                 end
             end
         end
-
         wait(0.01)
     end
 end)
 
-local spying = false
 Killer:AddToggle("Spy Player", function(bool)
     spying = bool
-
     if not spying then
         local player = game.Players.LocalPlayer
         local camera = workspace.CurrentCamera
         camera.CameraSubject = player.Character and player.Character:FindFirstChild("Humanoid") or player
         return
     end
-
     while spying do
         local player = game.Players.LocalPlayer
         local target = game.Players:FindFirstChild(targetPlayerName)
-
         if target and target ~= player then
             local targetChar = target.Character
             local targetHumanoid = targetChar and targetChar:FindFirstChild("Humanoid")
-
             if targetHumanoid then
                 local camera = workspace.CurrentCamera
                 camera.CameraSubject = targetHumanoid
             end
         end
-
         wait(0.1)
     end
 end)
 
 Killer:AddLabel("Punching Tool")
-local autoEquipPunch = false
 Killer:AddToggle("Auto Equip Punch", function(state)
     autoEquipPunch = state
-
     while autoEquipPunch do
         local player = game.Players.LocalPlayer
         local punchTool = player.Backpack:FindFirstChild("Punch")
-
         if punchTool then
             punchTool.Parent = player.Character
         end
-
         wait(0.1)
     end
 end)
 
-local autoPunchNoAnim = false
 Killer:AddToggle("Auto Punch [No Animation]", function(state)
     autoPunchNoAnim = state
-
     while autoPunchNoAnim do
         local player = game.Players.LocalPlayer
         local playerName = player.Name
         local punchTool = player.Backpack:FindFirstChild("Punch") or game.Workspace:FindFirstChild(playerName):FindFirstChild("Punch")
-
         if punchTool then
             if punchTool.Parent ~= game.Workspace:FindFirstChild(playerName) then
                 punchTool.Parent = game.Workspace:FindFirstChild(playerName)
             end
-
             player.muscleEvent:FireServer("punch", "rightHand")
             player.muscleEvent:FireServer("punch", "leftHand")
         else
             warn("Punch tool not found")
             autoPunchNoAnim = false
         end
-
         wait(0.01)
     end
 end)
 
 Killer:AddToggle("Auto Punch", function(Value)
-    _G.autoPunchActive = Value
+    _G_autoPunchActive = Value
     if Value then
         local function equipAndModifyPunch()
-            while _G.autoPunchActive do
+            while _G_autoPunchActive do
                 local player = game.Players.LocalPlayer
                 local punch = player.Backpack:FindFirstChild("Punch")
                 if punch then
@@ -414,7 +414,7 @@ Killer:AddToggle("Auto Punch", function(Value)
         end
 
         local function autoPunchAction()
-            while _G.autoPunchActive do
+            while _G_autoPunchActive do
                 local player = game.Players.LocalPlayer
                 local character = player.Character
                 if character then
@@ -439,10 +439,10 @@ Killer:AddToggle("Auto Punch", function(Value)
 end)
 
 Killer:AddToggle("Fast Punch", function(Value)
-    _G.fastHitActive = Value
+    _G_fastHitActive = Value
     if Value then
         local function equipAndModifyPunch()
-            while _G.fastHitActive do
+            while _G_fastHitActive do
                 local player = game.Players.LocalPlayer
                 local punch = player.Backpack:FindFirstChild("Punch")
                 if punch then
@@ -479,29 +479,6 @@ Killer:AddToggle("Fast Punch", function(Value)
         end
     end
 end)
-
-local function formatNumber(number)
-    if not number then return "0" end
-    local formatted = tostring(math.floor(number))
-    local k
-    while true do  
-        formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
-        if k == 0 then break end
-    end
-    return formatted
-end
-
-local function formatLargeNumber(num)
-    if num >= 1e9 then
-        return string.format("%.2fB", num / 1e9)
-    elseif num >= 1e6 then
-        return string.format("%.2fM", num / 1e6)
-    elseif num >= 1e3 then
-        return string.format("%.2fK", num / 1e3)
-    else
-        return string.format("%.0f", num)
-    end
-end
 
 local Label = main:AddLabel("Statistics")
 local statsDisplay = Tabs.Timer:CreateParagraph("Statistics", {
@@ -547,13 +524,14 @@ task.spawn(function()
             formatNumber(currentRebirths) .. " (" .. formatLargeNumber(currentRebirths) .. ")",
             formatNumber(rebirthsGained) .. " (" .. formatLargeNumber(rebirthsGained) .. ")",
             days, hours, minutes, seconds,
-            formatNumber(perMinute) .. " (" .. formatLargeNumber(perMinute) .. ")",
-            formatNumber(perHour) .. " (" .. formatLargeNumber(perHour) .. ")",
-            formatNumber(perDay) .. " (" .. formatLargeNumber(perDay) .. ")"
+            formatLargeNumber(perMinute),
+            formatLargeNumber(perHour),
+            formatLargeNumber(perDay)
         ))
-        task.wait(1)
+        wait(10)
     end
 end)
+
 
 local Teleport = window:CreateTab("Teleport")
 
