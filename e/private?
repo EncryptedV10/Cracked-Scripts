@@ -153,7 +153,7 @@ end)
 
 local Killer = window:CreateTab("Killing")
 
-Killer:AddSwitch("Auto Good Karma", function(bool)
+Killer:AddToggle("Auto Good Karma", function(bool)
     autoGoodKarma = bool
 
     if autoGoodKarma then
@@ -190,7 +190,7 @@ Killer:AddSwitch("Auto Good Karma", function(bool)
     end
 end)
 
-Killer:AddSwitch("Auto Bad Karma", function(bool)
+Killer:AddToggle("Auto Bad Karma", function(bool)
     autoBadKarma = bool
 
     if autoBadKarma then
@@ -245,7 +245,7 @@ end)
 
 Killer:AddLabel("Auto Killing")
 local autoKill = false
-Killer:AddSwitch("Auto Kill", function(bool)
+Killer:AddToggle("Auto Kill", function(bool)
     autoKill = bool
 
     while autoKill do
@@ -297,7 +297,7 @@ game.Players.PlayerRemoving:Connect(function(player)
 end)
 
 local killTarget = false
-Killer:AddSwitch("Kill Target", function(bool)
+Killer:AddToggle("Kill Target", function(bool)
     killTarget = bool
 
     while killTarget do
@@ -326,7 +326,7 @@ Killer:AddSwitch("Kill Target", function(bool)
 end)
 
 local spying = false
-Killer:AddSwitch("Spy Player", function(bool)
+Killer:AddToggle("Spy Player", function(bool)
     spying = bool
 
     if not spying then
@@ -356,7 +356,7 @@ end)
 
 Killer:AddLabel("Punching Tool")
 local autoEquipPunch = false
-Killer:AddSwitch("Auto Equip Punch", function(state)
+Killer:AddToggle("Auto Equip Punch", function(state)
     autoEquipPunch = state
 
     while autoEquipPunch do
@@ -372,7 +372,7 @@ Killer:AddSwitch("Auto Equip Punch", function(state)
 end)
 
 local autoPunchNoAnim = false
-Killer:AddSwitch("Auto Punch [No Animation]", function(state)
+Killer:AddToggle("Auto Punch [No Animation]", function(state)
     autoPunchNoAnim = state
 
     while autoPunchNoAnim do
@@ -396,7 +396,7 @@ Killer:AddSwitch("Auto Punch [No Animation]", function(state)
     end
 end)
 
-Killer:AddSwitch("Auto Punch", function(Value)
+Killer:AddToggle("Auto Punch", function(Value)
     _G.autoPunchActive = Value
     if Value then
         local function equipAndModifyPunch()
@@ -438,7 +438,7 @@ Killer:AddSwitch("Auto Punch", function(Value)
     end
 end)
 
-Killer:AddSwitch("Fast Punch", function(Value)
+Killer:AddToggle("Fast Punch", function(Value)
     _G.fastHitActive = Value
     if Value then
         local function equipAndModifyPunch()
