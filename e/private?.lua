@@ -4,7 +4,6 @@ local window = Library:AddWindow("Adopt's Private Script")
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local VirtualUser = game:GetService("VirtualUser")
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local player = Players.LocalPlayer
 
@@ -244,8 +243,7 @@ local KillTargetToggle = KillerTab:AddToggle("Kill Target", function(Value)
                 if hrp then
                     firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, hrp, 0)
                     firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, hrp, 1)
-                    
-                    -- Perform punching action on the target
+
                     local player = game.Players.LocalPlayer
                     local character = player.Character
                     if character then
