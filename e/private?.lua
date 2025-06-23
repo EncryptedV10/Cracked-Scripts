@@ -150,3 +150,129 @@ main:AddToggle("HideFrames", function(state)
         end
     end
 end)
+
+local KillerTab = window:CreateTab("Killing")
+
+KillerTab:AddLabel("Whitelist")
+local TextBox = KillerTab:AddTextbox("Whitelist Player", function(text)
+end)
+
+local TextBoxUnWhitelist = KillerTab:AddTextbox("UnWhitelist Player", function(text)
+end)
+
+KillerTab:AddLabel("Killer")
+local AutoKillToggle = KillerTab:AddToggle("Auto Kill", function(Value)
+    _G.autoPunchActive = Value
+
+    if Value then
+        local function equipAndModifyPunch()
+            while _G.autoPunchActive do
+                local player = game.Players.LocalPlayer
+                local punch = player.Backpack:FindFirstChild("Punch")
+                if punch then
+                    punch.Parent = player.Character
+                    if punch:FindFirstChild("attackTime") then
+                        punch.attackTime.Value = 0
+                    end
+                end
+                wait(0)
+            end
+        end
+
+        local function autoPunchAction()
+            while _G.autoPunchActive do
+                local player = game.Players.LocalPlayer
+                local character = player.Character
+                if character then
+                    local punchTool = character:FindFirstChild("Punch")
+                    if punchTool then
+                        punchTool:Activate()
+                    end
+                end
+                wait(0)
+            end
+        end
+
+        coroutine.wrap(equipAndModifyPunch)()
+        coroutine.wrap(autoPunchAction)()
+
+        while _G.autoPunchActive do
+            for _, plr in pairs(game.Players:GetPlayers()) do
+                if not table.find(whitelistedPlayers, plr.Name) then
+                    local hrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+                    if hrp then
+                        firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, hrp, 0)
+                        firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, hrp, 1)
+                    end
+                end
+            end
+            wait(0.1)
+        end
+    else
+        local character = game.Players.LocalPlayer.Character
+        local equipped = character:FindFirstChild("Punch")
+        if equipped then
+            equipped.Parent = game.Players.LocalPlayer.Backpack
+        end
+    end
+end)
+
+KillerTab:AddLabel("Targeting")
+local playerList = {}
+
+game.Players.PlayerAdded:Connect(function(player)
+    table.insert(playerList, player.Name)
+end)
+
+game.Players.PlayerRemoving:Connect(function(player)
+    for i, v in pairs(playerList) do
+        if v == player.Name then
+            table.remove(playerList, i)
+        end
+    end
+end)
+
+local Dropdown = KillerTab:AddDropdown("Dropdown", playerList, function(selected)
+end)
+
+local KillTargetToggle = KillerTab:AddToggle("Kill Target", function(Value)
+    if Value then
+        while Value do
+            local target = game.Players:FindFirstChild(Dropdown.Selected)
+            if target then
+                local hrp = target.Character and target.Character:FindFirstChild("HumanoidRootPart")
+                if hrp then
+                    firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, hrp, 0)
+                    firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, hrp, 1)
+                    
+                    -- Perform punching action on the target
+                    local player = game.Players.LocalPlayer
+                    local character = player.Character
+                    if character then
+                        local punchTool = character:FindFirstChild("Punch")
+                        if punchTool then
+                            punchTool:Activate()
+                        end
+                    end
+                end
+            end
+            wait(0.1)
+        end
+    end
+end)
+
+local SpecateTargetToggle = KillerTab:AddToggle("Specate Target", function(Value)
+    if Value then
+        local target = game.Players:FindFirstChild(Dropdown.Selected)
+        if target then
+            local camera = game.Workspace.CurrentCamera
+            camera.CameraSubject = target.Character.Humanoid
+            game:GetService("RunService").Heartbeat:Connect(function()
+                if not target.Character or not target.Character:FindFirstChild("HumanoidRootPart") then
+                    Value = false
+                    camera.CameraSubject = game.Players.LocalPlayer.Character.Humanoid
+                end
+            end)
+        end
+    end
+end)
