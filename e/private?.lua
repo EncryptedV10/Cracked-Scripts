@@ -65,7 +65,7 @@ main:AddToggle("SpeedGrind", function(state)
     end
 
     equipUniquePet("Swift Samurai")
-    for i = 1, 125 do
+    for i = 1, 21 do
         task.spawn(function()
             while isSpeedGrinding do
                 for j = 1, 2 do
